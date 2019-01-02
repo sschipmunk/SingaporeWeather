@@ -18,7 +18,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow.init(frame: UIScreen.main.bounds)
@@ -32,7 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     public class func configRealm() {
-        /// 如果要存取的数据模型属性发生变化，需要配置当前版本号比之前的大
         let dbVersion: UInt64 = 2
         let docPath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0] as String
         let dbPath = docPath.appending("/defaultDB.realm")

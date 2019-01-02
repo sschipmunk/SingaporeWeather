@@ -12,9 +12,6 @@ import Cluster
 
 
 class ViewController: UIViewController {
-
-    let region = (center: CLLocationCoordinate2D(latitude: 1.350772, longitude: 103.839), delta: 0.1)
-    
     var showErroAlart:Bool = false
     
     //MARK: - Life
@@ -32,23 +29,21 @@ class ViewController: UIViewController {
         HTTPAccesser.get("https://api.data.gov.sg/v1/environment/2-hour-weather-forecast?date_time\(currentTime(isDateTime: true))=&date=\(currentTime(isDateTime: false))") { (response: GeneralResponse<Area>) in
             if response.success {
                 if let areaModel = response.result {
-                    self.realoadMapFromRequest(area: areaModel)
+                    self.reloadMapFromRequest(area: areaModel)
                 }
             } else {
                 let alert = UIAlertController(title: "Tip", message: "Network error", preferredStyle: .alert)
-                
-               let action =  UIAlertAction(title: "Try again", style: .destructive, handler: { (cancelAction) in
+                let action =  UIAlertAction(title: "Try again", style: .destructive, handler: { (cancelAction) in
                     self.areaRequest()
                 })
-                
                 alert.addAction(action)
                 
                 if !self.showErroAlart {
-                   self.present(alert, animated: true, completion: nil)
+                    self.present(alert, animated: true, completion: nil)
                 }
                 
                 self.showErroAlart = true
-                self.realoadMapFromDB()
+                self.reloadMapFromDB()
             }
         }
     }
@@ -57,6 +52,7 @@ class ViewController: UIViewController {
     lazy var mapView:MKMapView = {
         let mapView = MKMapView(frame: view.bounds)
         mapView.delegate = self
+        let region = (center: CLLocationCoordinate2D(latitude: 1.350772, longitude: 103.839), delta: 0.1)
         mapView.region = .init(center: region.center, span: .init(latitudeDelta: region.delta, longitudeDelta: region.delta))
         mapView.addSubview(reloadButton)
         return mapView
@@ -95,8 +91,8 @@ class ViewController: UIViewController {
 
 //MARK: - Data Processing
 extension ViewController {
-    func realoadMapFromRequest(area:Area)  {
-        let queue = DispatchQueue(label: "realoadMapFromRequest")
+    func reloadMapFromRequest(area:Area)  {
+        let queue = DispatchQueue(label: "reloadMapFromRequest")
         queue.async {
             var annotationList = [Annotation]()
             var forecastsDict: Dictionary<String,String> = ["":""]
@@ -121,17 +117,16 @@ extension ViewController {
                     }
                     
                 }
-            DispatchQueue.main.async {
-                self.manager.add(annotationList)
-                self.manager.reload(mapView: self.mapView)
-                self.saveOrUpdateDB(forecastsDict: forecastsDict, metaData: metaData)
+                DispatchQueue.main.async {
+                    self.manager.add(annotationList)
+                    self.manager.reload(mapView: self.mapView)
+                    self.saveOrUpdateDB(forecastsDict: forecastsDict, metaData: metaData)
+                }
             }
-        }
-
         }
     }
     
-    func realoadMapFromDB()  {
+    func reloadMapFromDB()  {
         let areas = AreaRealmTool.getAreas()
         if areas.count > 0 {
             var annotationList = [Annotation]()
@@ -177,7 +172,6 @@ extension ViewController {
     
     func currentTime(isDateTime:Bool) -> String {
         let dateformatter = DateFormatter()
-        
         if isDateTime {
             dateformatter.dateFormat = "yyyy-MM-dd'T'HH'%3A'mm'%3A'ss"
         } else {
@@ -189,7 +183,6 @@ extension ViewController {
 
 //MARK: - MKMapViewDelegate
 extension ViewController: MKMapViewDelegate {
-    
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         let identifier = "Pin"
         let annotationView = mapView.annotationView(of: MKPinAnnotationView.self, annotation: annotation, reuseIdentifier: identifier)
