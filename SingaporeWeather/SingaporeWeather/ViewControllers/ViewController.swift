@@ -10,10 +10,12 @@ import UIKit
 import MapKit
 import Cluster
 
+
 class ViewController: UIViewController {
 
     let region = (center: CLLocationCoordinate2D(latitude: 1.350772, longitude: 103.839), delta: 0.1)
     
+    //MARK: - Life
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -21,33 +23,72 @@ class ViewController: UIViewController {
         
         view.addSubview(mapView)
         
-//        manager.add(Annotation(coordinate: region.center))
-        
         gcdTimer.resume()
-       
     }
     
+    //MARK: - Request
     @objc func areaRequest() {
-        
         manager.removeAll()
         manager.reload(mapView: mapView)
         
-        print("开始请求")
         HTTPAccesser.get("https://api.data.gov.sg/v1/environment/2-hour-weather-forecast?date_time=2019-01-02T15%3A07%3A15&date=2019-01-02") { (response: GeneralResponse<Area>) in
             if response.success {
                 
                 if let areaModel = response.result {
-                    self.realoadMap(area: areaModel)
+                    self.realoadMapFromRequest(area: areaModel)
                 }
             } else {
+                
+                self.realoadMapFromDB()
                 
                 print("failure")
             }
         }
-        
     }
     
-    func realoadMap(area:Area)  {
+    //MARK: - Lazy
+    lazy var mapView:MKMapView = {
+        let mapView = MKMapView(frame: view.bounds)
+        mapView.delegate = self
+        mapView.region = .init(center: region.center, span: .init(latitudeDelta: region.delta, longitudeDelta: region.delta))
+        mapView.addSubview(reloadButton)
+        return mapView
+    }()
+    lazy var reloadButton:UIButton = {
+        let reloadButton = UIButton()
+        let width = SWScreenWidth / 4
+        let height:CGFloat = 40.0
+        let x = (SWScreenWidth - width) / 2
+        let y = SWScreenHeight - (height * 4)
+        reloadButton.frame = CGRect.init(x: x, y: y, width: width, height: height)
+        reloadButton.backgroundColor = UIColor.gray
+        reloadButton.alpha = 0.4
+        reloadButton.layer.cornerRadius = 4
+        reloadButton.layer.masksToBounds = true
+        reloadButton.setTitle("UPDATA", for: .normal)
+        reloadButton.addTarget(self, action: #selector(areaRequest), for: UIControl.Event.touchUpInside)
+        return reloadButton
+    }()
+    lazy var manager: ClusterManager = {
+        let manager = ClusterManager()
+        manager.maxZoomLevel = 17
+        manager.minCountForClustering = 3
+        manager.clusterPosition = .nearCenter
+        return manager
+    }()
+    lazy var gcdTimer : DispatchSourceTimer = {
+        let gcdTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
+        gcdTimer.setEventHandler(handler: {
+            self.areaRequest()
+        })
+        gcdTimer.schedule(deadline: .now(), repeating: 120)
+        return gcdTimer
+    }()
+}
+
+//MARK: - Data Processing
+extension ViewController {
+    func realoadMapFromRequest(area:Area)  {
         
         var annotationList = [Annotation]()
         var forecastsDict: Dictionary<String,String> = ["":""]
@@ -73,72 +114,71 @@ class ViewController: UIViewController {
                 }
                 
             }
-            self.manager.add(annotationList)
-            self.manager.reload(mapView: self.mapView)
+            
+            manager.add(annotationList)
+            manager.reload(mapView: mapView)
+            
+            saveOrUpdateDB(forecastsDict: forecastsDict, metaData: metaData)
         }
     }
-
-
-    lazy var mapView:MKMapView = {
-        let mapView = MKMapView(frame: view.bounds)
-         mapView.delegate = self
-         mapView.region = .init(center: region.center, span: .init(latitudeDelta: region.delta, longitudeDelta: region.delta))
-         mapView.addSubview(reloadButton)
-        return mapView
-    }()
     
-    lazy var reloadButton:UIButton = {
-        let reloadButton = UIButton()
-        let width = SWScreenWidth / 4
-        let height:CGFloat = 40.0
-        let x = (SWScreenWidth - width) / 2
-        let y = SWScreenHeight - (height * 4)
-        reloadButton.frame = CGRect.init(x: x, y: y, width: width, height: height)
-        reloadButton.backgroundColor = UIColor.gray
-        reloadButton.alpha = 0.4
-        reloadButton.layer.cornerRadius = 4
-        reloadButton.layer.masksToBounds = true
-        reloadButton.setTitle("UPDATA", for: .normal)
-        reloadButton.addTarget(self, action: #selector(areaRequest), for: UIControl.Event.touchUpInside)
-        return reloadButton
-    }()
+    func realoadMapFromDB()  {
+        let areas = AreaRealmTool.getAreas()
+        if areas.count > 0 {
+            var annotationList = [Annotation]()
+            
+            for area in areas {
+                let annotation = Annotation()
+                
+                annotation.title = area.name
+                annotation.subtitle = area.forecast
+                if let latitude = area.location?.latitude,let longitude = area.location?.longitude {
+                    annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                }
+                annotationList.append(annotation)
+            }
+            
+            manager.add(annotationList)
+            manager.reload(mapView: mapView)
+        }
+    }
     
-    lazy var manager: ClusterManager = {
-        let manager = ClusterManager()
-        manager.delegate = self
-        manager.maxZoomLevel = 17
-        manager.minCountForClustering = 3
-        manager.clusterPosition = .nearCenter
-        return manager
-    }()
-    lazy var gcdTimer : DispatchSourceTimer = {
-        let gcdTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
-        gcdTimer.setEventHandler(handler: {
-            self.areaRequest()
-        })
-        gcdTimer.schedule(deadline: .now(), repeating: 120)
-        return gcdTimer
-    }()
+    
+    
+    func saveOrUpdateDB(forecastsDict: Dictionary<String,String>,metaData:[AreaMetadata])  {
+        var areaList = [AreaDB]()
+        for data in metaData {
+            if let latitude = data.label_location?.latitude,let longitude = data.label_location?.longitude {
+                let area = AreaDB()
+                area.name = data.name
+                area.forecast = forecastsDict["\(data.name)"] ?? ""
+                let location = LocationDB()
+                location.latitude = latitude
+                location.longitude = longitude
+                area.location = location
+                areaList.append(area)
+            }
+        }
+        
+        let areas = AreaRealmTool.getAreas()
+        if areas.count > 0 {
+            AreaRealmTool.updateAreas(areas: areaList)
+        } else {
+            AreaRealmTool.insertAreas(by: areaList)
+        }
+    }
 }
 
 //MARK: - MKMapViewDelegate
 extension ViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        if let annotation = annotation as? Annotation {
-            let identifier = "Pin"
-            let annotationView = mapView.annotationView(of: MKPinAnnotationView.self, annotation: annotation, reuseIdentifier: identifier)
-            annotationView.pinTintColor = .green
-            annotationView.canShowCallout = true
-            annotationView.isSelected = true
-            return annotationView
-        }
-        else {
-            let identifier = "Me"
-            let annotationView = mapView.annotationView(of: MKAnnotationView.self, annotation: annotation, reuseIdentifier: identifier)
-            annotationView.image = .me
-            return annotationView
-        }
+        let identifier = "Pin"
+        let annotationView = mapView.annotationView(of: MKPinAnnotationView.self, annotation: annotation, reuseIdentifier: identifier)
+        annotationView.pinTintColor = .green
+        annotationView.canShowCallout = true
+        annotationView.isSelected = true
+        return annotationView
     }
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
@@ -152,19 +192,6 @@ extension ViewController: MKMapViewDelegate {
         UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: [], animations: {
             views.forEach { $0.alpha = 1 }
         }, completion: nil)
-    }
-    
-}
-
-//MARK: - ClusterManagerDelegate
-extension ViewController: ClusterManagerDelegate {
-    
-    func cellSize(for zoomLevel: Double) -> Double {
-        return 0 // default
-    }
-    
-    func shouldClusterAnnotation(_ annotation: MKAnnotation) -> Bool {
-        return true
     }
     
 }
