@@ -12,18 +12,22 @@ import Cluster
 
 
 class ViewController: UIViewController {
+    
     var showErroAlart:Bool = false
+    var CountDown:Int = secondNumber
     
     //MARK: - Life
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.addSubview(mapView)
+        
+        areaRequest()
         gcdTimer.resume()
     }
     
     //MARK: - Request
-    @objc func areaRequest() {
+     func areaRequest() {
         manager.removeAll()
         manager.reload(mapView: mapView)
         HTTPAccesser.get("https://api.data.gov.sg/v1/environment/2-hour-weather-forecast?date_time\(currentTime(isDateTime: true))=&date=\(currentTime(isDateTime: false))") { (response: GeneralResponse<Area>) in
@@ -48,6 +52,12 @@ class ViewController: UIViewController {
         }
     }
     
+    //MARK: - Touch Methonds
+    @objc func touchReloadButton() {
+        CountDown = secondNumber
+        areaRequest()
+    }
+    
     //MARK: - Lazy
     lazy var mapView:MKMapView = {
         let mapView = MKMapView(frame: view.bounds)
@@ -69,7 +79,7 @@ class ViewController: UIViewController {
         reloadButton.layer.cornerRadius = 4
         reloadButton.layer.masksToBounds = true
         reloadButton.setTitle("UPDATA", for: .normal)
-        reloadButton.addTarget(self, action: #selector(areaRequest), for: UIControl.Event.touchUpInside)
+        reloadButton.addTarget(self, action: #selector(touchReloadButton), for: UIControl.Event.touchUpInside)
         return reloadButton
     }()
     lazy var manager: ClusterManager = {
@@ -82,11 +92,12 @@ class ViewController: UIViewController {
     lazy var gcdTimer : DispatchSourceTimer = {
         let gcdTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
         gcdTimer.setEventHandler(handler: {
-            self.areaRequest()
+            self.countdownReduction()
         })
-        gcdTimer.schedule(deadline: .now(), repeating: 120)
+        gcdTimer.schedule(deadline: .now(), repeating: 1)
         return gcdTimer
     }()
+
 }
 
 //MARK: - Data Processing
@@ -115,7 +126,6 @@ extension ViewController {
                         
                         annotationList.append(annotation)
                     }
-                    
                 }
                 DispatchQueue.main.async {
                     self.manager.add(annotationList)
@@ -178,6 +188,15 @@ extension ViewController {
             dateformatter.dateFormat = "YYYY-MM-DD"
         }
         return dateformatter.string(from: Date())
+    }
+    
+    func countdownReduction()  {
+        CountDown = CountDown - 1
+        print(CountDown)
+        if CountDown == 0 {
+            CountDown = secondNumber
+            areaRequest()
+        }
     }
 }
 

@@ -11,6 +11,7 @@ import RealmSwift
 
 let SWScreenWidth = UIScreen.main.bounds.width
 let SWScreenHeight = UIScreen.main.bounds.height
+let secondNumber:Int = 120
 
 @UIApplicationMain
 
