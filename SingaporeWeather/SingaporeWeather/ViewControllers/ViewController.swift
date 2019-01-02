@@ -192,7 +192,6 @@ extension ViewController {
     
     func countdownReduction()  {
         CountDown = CountDown - 1
-        print(CountDown)
         if CountDown == 0 {
             CountDown = secondNumber
             areaRequest()
