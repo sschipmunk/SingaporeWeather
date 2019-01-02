@@ -15,7 +15,15 @@ class ViewController: UIViewController {
         
         view.backgroundColor = UIColor.white
         
-        
+        HTTPAccesser.get("https://api.data.gov.sg/v1/environment/2-hour-weather-forecast?date_time=2019-01-02T15%3A07%3A15&date=2019-01-02") { (response: GeneralResponse<Area>) in
+            if response.success {
+                
+                print("success")
+            } else {
+                
+                print("failure")
+            }
+        }
     }
 
 

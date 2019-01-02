@@ -15,7 +15,7 @@ public final class HTTPAccesser {
         
         let configuration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = SessionManager.defaultHTTPHeaders
-        configuration.timeoutIntervalForRequest = 60
+        configuration.timeoutIntervalForRequest = 10
         var serverTrustPolicies: [String: ServerTrustPolicy] = [:]
         
         return SessionManager(
@@ -27,7 +27,7 @@ public final class HTTPAccesser {
     //同步请求，当前线程
     public static func doRequest<T>(_ method: Alamofire.HTTPMethod, url: URLConvertible, parameters: Parameters? = nil) -> GeneralResponse<T> where T: HandyJSON {
         let semaphore = DispatchSemaphore(value: 0)
-        let timeout = DispatchTime.init(uptimeNanoseconds: 60 * 1000 * 1000 * 1000 )
+        let timeout = DispatchTime.init(uptimeNanoseconds: 10 * 1000 * 1000 * 1000 )
         
         var res:GeneralResponse<T>? = nil
         enRequest(method, url: url, parameters: parameters, queue: nil) { (resp:GeneralResponse<T>) in
