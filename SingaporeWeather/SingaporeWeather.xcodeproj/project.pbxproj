@@ -13,6 +13,7 @@
 		0902931121DD075D0054A72E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0902931021DD075D0054A72E /* Assets.xcassets */; };
 		0902931421DD075D0054A72E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0902931221DD075D0054A72E /* LaunchScreen.storyboard */; };
 		0902932021DD0A500054A72E /* HTTPAccesser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0902931F21DD0A500054A72E /* HTTPAccesser.swift */; };
+		0902932221DD0AE20054A72E /* Area.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0902932121DD0AE20054A72E /* Area.swift */; };
 		680672F46C06A5CDE8B5E840 /* Pods_SingaporeWeather.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 155BF206BDAC526AAF581FE2 /* Pods_SingaporeWeather.framework */; };
 /* End PBXBuildFile section */
 
@@ -25,6 +26,7 @@
 		0902931321DD075D0054A72E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0902931521DD075D0054A72E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0902931F21DD0A500054A72E /* HTTPAccesser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPAccesser.swift; sourceTree = "<group>"; };
+		0902932121DD0AE20054A72E /* Area.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Area.swift; sourceTree = "<group>"; };
 		155BF206BDAC526AAF581FE2 /* Pods_SingaporeWeather.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SingaporeWeather.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C06EA20CDDBE918AC6B6D572 /* Pods-SingaporeWeather.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SingaporeWeather.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SingaporeWeather/Pods-SingaporeWeather.debug.xcconfig"; sourceTree = "<group>"; };
 		E02832F465A2DB1007C4A341 /* Pods-SingaporeWeather.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SingaporeWeather.release.xcconfig"; path = "Pods/Target Support Files/Pods-SingaporeWeather/Pods-SingaporeWeather.release.xcconfig"; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 		0902931C21DD079C0054A72E /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				0902932121DD0AE20054A72E /* Area.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 			files = (
 				0902930C21DD075B0054A72E /* ViewController.swift in Sources */,
 				0902930A21DD075B0054A72E /* AppDelegate.swift in Sources */,
+				0902932221DD0AE20054A72E /* Area.swift in Sources */,
 				0902932021DD0A500054A72E /* HTTPAccesser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
