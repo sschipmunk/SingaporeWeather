@@ -34,6 +34,38 @@ class CountClusterAnnotationView: ClusterAnnotationView {
         }
     }
 }
+ class AreaAnnotationView: MKAnnotationView {
+    
+    open lazy var countLabel: UILabel = {
+        let label = UILabel()
+        label.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        label.backgroundColor = .clear
+        label.font = .boldSystemFont(ofSize: 13)
+        label.textColor = .white
+        label.textAlignment = .center
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.5
+        label.baselineAdjustment = .alignCenters
+        self.addSubview(label)
+        return label
+    }()
+    
+    var name:String = ""
+    var fa:String = ""
+    
+    open override var annotation: MKAnnotation? {
+        didSet {
+            countLabel.text = name
+        }
+    }
+    
+    open func configure() {
+        guard let annotation = annotation as? ClusterAnnotation else { return }
+//        let count = annotation.annotations.count
+        countLabel.text = name
+    }
+    
+}
 
 class ImageCountClusterAnnotationView: ClusterAnnotationView {
     lazy var once: Void = {
