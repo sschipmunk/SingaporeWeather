@@ -23,18 +23,28 @@ class ViewController: UIViewController {
         
         manager.add(Annotation(coordinate: region.center))
         
+        gcdTimer.resume()
+       
+    }
+    
+    func areaRequest() {
+        
+        manager.removeAll()
+        manager.reload(mapView: mapView)
+        
+        print("开始请求")
         HTTPAccesser.get("https://api.data.gov.sg/v1/environment/2-hour-weather-forecast?date_time=2019-01-02T15%3A07%3A15&date=2019-01-02") { (response: GeneralResponse<Area>) in
             if response.success {
-
+                
                 if let areaModel = response.result {
                     self.realoadMap(area: areaModel)
                 }
             } else {
-
+                
                 print("failure")
             }
         }
-    
+        
     }
     
     func realoadMap(area:Area)  {
@@ -57,7 +67,6 @@ class ViewController: UIViewController {
                     print(data.name)
                     annotation.title = data.name
                     annotation.subtitle = forecastsDict["\(data.name)"]
-                    
                     annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
                     
                     annotationList.append(annotation)
@@ -84,6 +93,14 @@ class ViewController: UIViewController {
         manager.minCountForClustering = 3
         manager.clusterPosition = .nearCenter
         return manager
+    }()
+    lazy var gcdTimer : DispatchSourceTimer = {
+        let gcdTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
+        gcdTimer.setEventHandler(handler: {
+            self.areaRequest()
+        })
+        gcdTimer.schedule(deadline: .now(), repeating: 120)
+        return gcdTimer
     }()
 }
 
