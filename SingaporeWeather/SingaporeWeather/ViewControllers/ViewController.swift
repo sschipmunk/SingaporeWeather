@@ -21,13 +21,13 @@ class ViewController: UIViewController {
         
         view.addSubview(mapView)
         
-        manager.add(Annotation(coordinate: region.center))
+//        manager.add(Annotation(coordinate: region.center))
         
         gcdTimer.resume()
        
     }
     
-    func areaRequest() {
+    @objc func areaRequest() {
         
         manager.removeAll()
         manager.reload(mapView: mapView)
@@ -83,7 +83,28 @@ class ViewController: UIViewController {
         let mapView = MKMapView(frame: view.bounds)
          mapView.delegate = self
          mapView.region = .init(center: region.center, span: .init(latitudeDelta: region.delta, longitudeDelta: region.delta))
+         mapView.addSubview(reloadButton)
         return mapView
+    }()
+    
+    lazy var reloadButton:UIButton = {
+        let reloadButton = UIButton()
+        
+        let ScreenWidth = UIScreen.main.bounds.width
+        let ScreenHeight = UIScreen.main.bounds.height
+        let width = ScreenWidth / 4
+        let height:CGFloat = 40.0
+        let x = (ScreenWidth - width) / 2
+        let y = ScreenHeight - (height * 4)
+        
+        reloadButton.frame = CGRect.init(x: x, y: y, width: width, height: height)
+        reloadButton.backgroundColor = UIColor.gray
+        reloadButton.alpha = 0.4
+        reloadButton.layer.cornerRadius = 4
+        reloadButton.layer.masksToBounds = true
+        reloadButton.setTitle("UPDATA", for: .normal)
+        reloadButton.addTarget(self, action: #selector(areaRequest), for: UIControl.Event.touchUpInside)
+        return reloadButton
     }()
     
     lazy var manager: ClusterManager = {
