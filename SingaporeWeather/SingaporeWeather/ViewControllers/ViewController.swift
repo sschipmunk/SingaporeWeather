@@ -15,6 +15,8 @@ class ViewController: UIViewController {
 
     let region = (center: CLLocationCoordinate2D(latitude: 1.350772, longitude: 103.839), delta: 0.1)
     
+    var showErroAlart:Bool = false
+    
     //MARK: - Life
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,8 +35,20 @@ class ViewController: UIViewController {
                     self.realoadMapFromRequest(area: areaModel)
                 }
             } else {
+                let alert = UIAlertController(title: "Tip", message: "Network error", preferredStyle: .alert)
+                
+               let action =  UIAlertAction(title: "Try again", style: .destructive, handler: { (cancelAction) in
+                    self.areaRequest()
+                })
+                
+                alert.addAction(action)
+                
+                if !self.showErroAlart {
+                   self.present(alert, animated: true, completion: nil)
+                }
+                
+                self.showErroAlart = true
                 self.realoadMapFromDB()
-                print("failure")
             }
         }
     }
@@ -99,7 +113,6 @@ extension ViewController {
                 for data in metaData {
                     if let latitude = data.label_location?.latitude,let longitude = data.label_location?.longitude {
                         let annotation = Annotation()
-                        print(data.name)
                         annotation.title = data.name
                         annotation.subtitle = forecastsDict["\(data.name)"]
                         annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
@@ -119,7 +132,6 @@ extension ViewController {
     }
     
     func realoadMapFromDB()  {
-
         let areas = AreaRealmTool.getAreas()
         if areas.count > 0 {
             var annotationList = [Annotation]()

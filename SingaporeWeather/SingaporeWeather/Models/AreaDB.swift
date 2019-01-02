@@ -11,9 +11,7 @@ import RealmSwift
 
 class AreaDB: RealmSwift.Object {
     @objc public dynamic var name: String = ""
-    
     @objc public dynamic var forecast: String = ""
-    
     @objc public dynamic var location:LocationDB?
     
     override static func primaryKey() -> String? {

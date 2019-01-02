@@ -13,7 +13,6 @@ class AreaRealmTool: Object {
     public class func getDB() -> Realm {
         let docPath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0] as String
         let dbPath = docPath.appending("/defaultDB.realm")
-        /// 传入路径会自动创建数据库
         let defaultRealm = try! Realm(fileURL: URL.init(string: dbPath)!)
         return defaultRealm
     }
