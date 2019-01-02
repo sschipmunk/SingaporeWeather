@@ -89,14 +89,10 @@ class ViewController: UIViewController {
     
     lazy var reloadButton:UIButton = {
         let reloadButton = UIButton()
-        
-        let ScreenWidth = UIScreen.main.bounds.width
-        let ScreenHeight = UIScreen.main.bounds.height
-        let width = ScreenWidth / 4
+        let width = SWScreenWidth / 4
         let height:CGFloat = 40.0
-        let x = (ScreenWidth - width) / 2
-        let y = ScreenHeight - (height * 4)
-        
+        let x = (SWScreenWidth - width) / 2
+        let y = SWScreenHeight - (height * 4)
         reloadButton.frame = CGRect.init(x: x, y: y, width: width, height: height)
         reloadButton.backgroundColor = UIColor.gray
         reloadButton.alpha = 0.4

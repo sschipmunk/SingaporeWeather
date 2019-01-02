@@ -8,6 +8,7 @@ target 'SingaporeWeather' do
   pod 'HandyJSON',                '~> 4.2.0'
   pod 'Alamofire'
   pod 'Cluster'
+  pod 'RealmSwift'
 
   # Pods for SingaporeWeather
 
