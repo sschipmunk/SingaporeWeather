@@ -12,7 +12,7 @@ DEPENDENCIES:
   - Alamofire
   - Cluster
   - HandyJSON (~> 4.2.0)
-  - RealmSwift
+  - RealmSwift (= 3.12.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -29,6 +29,6 @@ SPEC CHECKSUMS:
   Realm: cdaef23c4ddb36ab1ddffed23f5a7f3332fc5585
   RealmSwift: 5576324033f0aa5ef1e0a839a3da2281dff47a7f
 
-PODFILE CHECKSUM: c03dae019bf5c09d0f3a2c7c9c61a47bd9035ffe
+PODFILE CHECKSUM: abe1a57944b24b237b723b6b52d426474c586c15
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0.rc.1

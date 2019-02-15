@@ -209,7 +209,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-SingaporeWeather/Pods-SingaporeWeather-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-SingaporeWeather/Pods-SingaporeWeather-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Cluster/Cluster.framework",
 				"${BUILT_PRODUCTS_DIR}/HandyJSON/HandyJSON.framework",
@@ -228,7 +228,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SingaporeWeather/Pods-SingaporeWeather-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SingaporeWeather/Pods-SingaporeWeather-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		14FD33430DF2128D70334AFD /* [CP] Check Pods Manifest.lock */ = {
